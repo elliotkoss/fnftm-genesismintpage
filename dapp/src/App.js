@@ -245,15 +245,17 @@ function App() {
               />{' '}&nbsp;&nbsp;&nbsp;
             </StyledLink> 
             */} 
-            <Button style={{ backgroundColor: "#F83700", border: "#F83700" }}
-              onClick={(e) => {
-                e.preventDefault();
-                dispatch(connect());
-                getData();
-              } }
-            >
-              Connect Wallet
-            </Button>          
+            { (blockchain.account !== "" && blockchain.smartContract !== null) ?
+              <Button style={{ backgroundColor: "#F83700", border: "#F83700" }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch(connect());
+                  getData();
+                } }
+              >
+                Connect Wallet
+              </Button> : null
+            }
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -360,15 +362,17 @@ function App() {
 
                 <Row  style={{ paddingBottom:"25px" }}>
                   <Col xs={12} style={{ paddingTop:"25px", textAlign: "center" }}>
-                    <Button style={{ backgroundColor: "#F83700", border: "#F83700", width:"100%" }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        dispatch(connect());
-                        getData();
-                      } }
-                    >
-                      Connect Wallet
-                    </Button>   
+                    { (blockchain.account !== "" && blockchain.smartContract !== null) ?
+                      <Button style={{ backgroundColor: "#F83700", border: "#F83700", width:"100%" }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          dispatch(connect());
+                          getData();
+                        } }
+                      >
+                        Connect Wallet
+                      </Button> : null
+                    }
                   </Col>
                 </Row>      
               
