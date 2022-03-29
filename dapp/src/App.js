@@ -334,7 +334,7 @@ function App() {
     } else if (data.isAllowListMintEnabled) {
       return <Col style={{ textAlign: "left", color: "#ffffff" }}>Allow List (Wallet Limit 2)</Col>
     } else {
-      return <Col style={{ textAlign: "left", color: "#ffffff" }}>Mint not open yet. Allow List opens on Mar 28 @ 12pm ET</Col>
+      return <Col style={{ textAlign: "left", color: "#ffffff" }}></Col>
     }
   }
 
