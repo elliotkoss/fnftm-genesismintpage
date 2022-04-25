@@ -20,25 +20,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const truncate = (input, len) =>
   input.length > len ? `${input.substring(0, len)}...` : input;
 
-export const StyledButton = styled.button`
-  padding: 10px;
-  border-radius: 50px;
-  border: none;
-  background-color: var(--secondary);
-  padding: 10px;
-  font-weight: bold;
-  color: var(--secondary-text);
-  width: 100px;
-  cursor: pointer;
-  box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
-  -webkit-box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
-  -moz-box-shadow: 0px 6px 0px -2px rgba(250, 250, 250, 0.3);
-  :active {
-    box-shadow: none;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-  }
-`;
+
 
 export const StyledRoundButton = styled.button`
   padding: 10px;
@@ -63,42 +45,6 @@ export const StyledRoundButton = styled.button`
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
   }
-`;
-
-export const ResponsiveWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: stretched;
-  align-items: stretched;
-  width: 100%;
-  @media (min-width: 767px) {
-    flex-direction: row;
-  }
-`;
-
-export const StyledLogo = styled.img`
-  width: 200px;
-  @media (min-width: 767px) {
-    width: 300px;
-  }
-  transition: width 0.5s;
-  transition: height 0.5s;
-`;
-
-export const StyledImg = styled.img`
-  box-shadow: 0px 5px 11px 2px rgba(0, 0, 0, 0.7);
-  border: 4px dashed var(--secondary);
-  background-color: var(--accent);
-  border-radius: 100%;
-  width: 200px;
-  @media (min-width: 900px) {
-    width: 250px;
-  }
-  @media (min-width: 1000px) {
-    width: 300px;
-  }
-  transition: width 0.5s;
 `;
 
 export const StyledLink = styled.a`
@@ -300,15 +246,15 @@ function App() {
     if (data.isPublicMintEnabled) {
       currentPhase = 'Public'
       maxRemainingMint = 5 - balance
+    } else if (data.isPresaleMintEnabled) {
+      currentPhase = 'Presale'
+      maxRemainingMint = presaleListAllocation - balance
     } else if (allowListAllocation) {
       currentPhase = 'Allow List'
       maxRemainingMint = 2 - balance
-    } else if (presaleListAllocation) {
-      currentPhase = 'Presale'
-      maxRemainingMint = 2 - balance
     } else {
       maxRemainingMint = 0
-      currentPhase = 'Allow List'
+      currentPhase = 'this'
     }
 
     setFeedback(`${blockchain.account} can mint ${maxRemainingMint} during ${currentPhase} phase`)
@@ -334,7 +280,22 @@ function App() {
     } else if (data.isAllowListMintEnabled) {
       return <Col style={{ textAlign: "left", color: "#ffffff" }}>Allow List (Wallet Limit 2)</Col>
     } else {
-      return <Col style={{ textAlign: "left", color: "#ffffff" }}></Col>
+      return <Col style={{ textAlign: "left", color: "#ffffff" }}>Public (Wallet Limit 5)</Col>
+    }
+  }
+
+  const progressBar = () => {
+    if (blockchain.account!== "" && blockchain.smartContract !== null) {
+      return <><Row style={{ paddingTop:"25px" }}>
+            <Col>
+              <ProgressBar now={data.totalSupply / CONFIG.MAX_SUPPLY * 100} />
+            </Col>
+          </Row>
+          <Row style={{ paddingTop:"5px" }}>
+            <Col style={{ textAlign: "left", color: "#ffffff" }}>0.25 ETH</Col>
+            <Col style={{ textAlign: "right", color: "#ffffff" }}>{data.totalSupply} / {CONFIG.MAX_SUPPLY}</Col>
+          </Row>
+          </>
     }
   }
 
@@ -366,8 +327,8 @@ function App() {
   }
 
   const shouldRenderConnectedWalletMintUI = () => {
-    return data.isAllowListMintEnabled && parseInt(data.allowListAllocation) && parseInt(data.allowListAllocation) >= 0 ||
-      data.isPresaleMintEnabled && parseInt(data.presaleListAllocation) && parseInt(data.presaleListAllocation) >= 0 ||
+    return data.isAllowListMintEnabled && parseInt(data.allowListAllocation) && (parseInt(data.allowListAllocation) - parseInt(data.balance) ) > 0 ||
+      data.isPresaleMintEnabled && parseInt(data.presaleListAllocation) && (parseInt(data.presaleListAllocation) - parseInt(data.balance) ) ||
       data.isPublicMintEnabled
   }
 
@@ -385,7 +346,8 @@ function App() {
     </Row> : null
   }
 
-  const connectedWalletMintUI = () => {
+  const connectedWalletMintUI = () => {    
+
     return shouldRenderConnectedWalletMintUI() ? <>
       <s.SpacerMedium />
       <s.Container ai={"center"} jc={"center"} fd={"row"}>
@@ -436,8 +398,9 @@ function App() {
   }
 
   return (
-    <>
-      <Navbar style={{backgroundColor: "#000000" }}>
+    <>      
+
+      <Navbar collapseOnSelect expand="lg" variant="dark" style={{backgroundColor: "#000000" }}>
         <Container>
           <Navbar.Brand href="#home">
             <img
@@ -450,25 +413,53 @@ function App() {
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
+
             </Nav>
             <Nav>
-            <StyledLink target={"_blank"} href="https://twitter.com/futurenftmints">
-              <img
-                alt=""
-                src="/config/images/twitter.png"
-                height="30"
-                className="d-inline-block align-top"
-                margin="10"
-              />{' '}&nbsp;&nbsp;
-            </StyledLink>
-            <StyledLink target={"_blank"} href="https://discord.gg/futurenftmints">
-              <img
-                alt=""
-                src="/config/images/discord.png"
-                height="30"
-                className="d-inline-block align-top"
-              />{' '}&nbsp;&nbsp;&nbsp;
-            </StyledLink>
+
+              <Nav.Link href="#benefits" style={{ color: "#ffffff", verticalAlign: "baseline" }}>
+                Benefits
+              </Nav.Link>
+              <Nav.Link href="#roadmap" style={{ color: "#ffffff" }}>
+                Roadmap
+              </Nav.Link>
+              <Nav.Link href="#team" style={{ color: "#ffffff" }}>
+                Team
+              </Nav.Link>
+              <Nav.Link target={"_blank"} href="https://docs.google.com/document/d/169NvaWHpPEKkg6AucydhaOuz_Hn5ecexVfLDoe3mI08/edit#heading=h.z4mifle893rx" style={{ color: "#ffffff" }}>
+                White Paper
+              </Nav.Link>
+              <Nav.Link href="#faqs" style={{ color: "#ffffff" }}>
+                FAQs
+              </Nav.Link>
+              <Nav.Link target={"_blank"} href="https://twitter.com/futurenftmints">
+                <img
+                  alt=""
+                  src="/config/images/twitter.png"
+                  height="20"
+                  className="d-inline-block align-top"
+                />
+              </Nav.Link>
+              <Nav.Link target={"_blank"} href="https://discord.gg/futurenftmints">
+                <img
+                  alt=""
+                  src="/config/images/discord.png"
+                  height="20"
+                  className="d-inline-block align-top"
+                />
+              </Nav.Link>
+              <Nav.Link target={"_blank"} href="https://opensea.io/collection/future-nft-mints-genesis-nft">
+                <img
+                  alt=""
+                  src="/config/images/opensea.png"
+                  height="20"
+                  className="d-inline-block align-top"
+                />
+              </Nav.Link>
+            
+
+            
+            {/*
             <StyledLink target={"_blank"} href="https://opensea.io/collection/future-nft-mints-genesis-nft">
               <img
                 alt=""
@@ -478,7 +469,6 @@ function App() {
               />{' '}&nbsp;&nbsp;&nbsp;
             </StyledLink>
 
-            {/*
             { (blockchain.account === "" ||  blockchain.smartContract === null) ?
               <Button style={{ backgroundColor: "#F83700", border: "#F83700" }}
                 onClick={(e) => {
@@ -490,56 +480,44 @@ function App() {
                 Connect Wallet
               </Button> : null
             }
-          */}
+            */}
+
+
 
 
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
+      
 
-      <Container fluid style={{ backgroundImage: "linear-gradient(#000000 10%, #A11692, #BD2164)" }}>
-        <Row style={{ paddingTop: "50px" }}>
+      <Container fluid>
+        <Row style={{ paddingTop: "50px", paddingBottom: "40px", backgroundColor: "#000000" }}>
           <Col md={1}></Col>
-          <Col md={6}>
-            <Row style={{ color: "#ffffff", fontSize:"2em"}}>
-              <Col>Genesis NFT</Col>
-            </Row>
+          <Col md={6}>            
             <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"3em", lineHeight: "1em" }}>
-              <Col>Lifetime access to the most in-depth NFT analysis.</Col>
+              <Col>Guide your buying decisions with access to</Col>
+            </Row>
+            <Row style={{ backgroundImage: "linear-gradient(0.15turn, #A11692, #BD2164, #FAC921 60%)", 
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          fontSize:"3em", 
+                          lineHeight: "1em" }}>
+              <Col>the most in-depth NFT research and analysis</Col>
             </Row>
             <Row style={{ paddingTop: "20px" }}>
-              <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"1.75em" }}>
-                <Col>IMMEDIATE UTILITY & PERKS</Col>
-              </Row>
-              <Row style={{ paddingTop:"25px", fontSize:"1.25em" }}>
-                <Col xs={1} style={{ textAlign: "left" }}><img alt="checkmark" src="/config/images/check-box.png" height="20" className="d-inline-block align-top"/></Col>
-                <Col style={{ color: "#ffffff" }}><StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://futurenftmints.com">Daily Future NFT Mints Newsletter</StyledLink> ($550/year value)</Col>
-              </Row>
-              <Row style={{ paddingTop:"15px", fontSize:"1.25em" }}>
-                <Col xs={1} style={{ textAlign: "left" }}><img alt="checkmark" src="/config/images/check-box.png" height="20" className="d-inline-block align-top"/></Col>
-                <Col style={{ color: "#ffffff" }}>Lifetime access to all research and analyses</Col>
-              </Row>
-              <Row style={{ paddingTop:"15px", fontSize:"1.25em" }}>
-                <Col xs={1} style={{ textAlign: "left" }}><img alt="checkmark" src="/config/images/check-box.png" height="20" className="d-inline-block align-top"/></Col>
-                <Col style={{ color: "#ffffff" }}>Private Discord</Col>
-              </Row>
-              <Row style={{ paddingTop:"15px", fontSize:"1.25em" }}>
-                <Col xs={1} style={{ textAlign: "left" }}><img alt="checkmark" src="/config/images/check-box.png" height="20" className="d-inline-block align-top"/></Col>
-                <Col style={{ color: "#ffffff" }}>1x Giveaway Spot per NFT. Stackable.</Col>
-              </Row>
-              <Row style={{ paddingTop:"15px", fontSize:"1.25em" }}>
-                <Col xs={1} style={{ textAlign: "left" }}><img alt="checkmark" src="/config/images/check-box.png" height="20" className="d-inline-block align-top"/></Col>
-                <Col style={{ color: "#ffffff" }}>Early Supporter T-shirt</Col>
-              </Row>
-              <Row style={{ paddingTop:"15px", fontSize:"1.25em" }}>
-                <Col xs={1} style={{ textAlign: "left" }}><img alt="checkmark" src="/config/images/check-box.png" height="20" className="d-inline-block align-top"/></Col>
-                <Col style={{ color: "#ffffff" }}>And so much more...</Col>
-              </Row>
+              <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"1.5em" }}>
+                <Col>At Future NFT Mints, we know that it can be hard keeping up with upcoming mint dates and 
+                knowing which NFTs to mint. That’s why the Genesis NFT gives you exclusive access to our research 
+                and analysis platform.
+                <br /><br />
+                In addition to our research, you will receive entries to giveaways that we run. 
+                The potential prizes for these giveaways include Allow List access to other NFT mints, virtual event access, and IRL invitations. </Col>
+              </Row>              
             </Row>
           </Col>
           <Col md={4}>
-            <Row style={{ paddingTop:"50px", textAlign: "center" }}>
+            <Row style={{ paddingTop:"20px", textAlign: "center" }}>
               <Col><img fluid="true" alt="Future NFT Mints - Genesis NFT Card" src="/config/images/fnftm-card.png" width="80%" className="d-inline-block align-top"/></Col>
             </Row>
 
@@ -554,16 +532,7 @@ function App() {
                   {mintPhaseMessage()}
                 </Row>
 
-                <Row style={{ paddingTop:"25px" }}>
-                  <Col>
-                    <ProgressBar now={data.totalSupply / CONFIG.MAX_SUPPLY * 100} />
-                  </Col>
-                </Row>
-
-                <Row style={{ paddingTop:"5px" }}>
-                  <Col style={{ textAlign: "left", color: "#ffffff" }}>0.25 ETH</Col>
-                  <Col style={{ textAlign: "right", color: "#ffffff" }}>{data.totalSupply} / {CONFIG.MAX_SUPPLY}</Col>
-                </Row>
+                {progressBar()}
 
                 <Row>
 
@@ -611,254 +580,431 @@ function App() {
           </Col>
           <Col md={1}></Col>
         </Row>
-
-
-        <Row>
-          <Col md={3}></Col>
-          <Col xs={12} md={7}>
-            <Row style={{ paddingTop: "80px", color: "#ffffff", fontSize:"1.5em", lineHeight:"1.25em" }}>
-              <Col xs={4}>ALLOW LIST</Col>
-              <Col>
-                Mon, March 28 at 12pm ET (Open Now)
-                <br /><StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://docs.google.com/spreadsheets/d/15YhXZI6W9v6sS8OT32fAsikhgck2AzMlJ3fK1KeOSoM/edit#gid=0">Check if you're on the Allow List</StyledLink>
-              </Col>
-            </Row>
-            <Row style={{ paddingTop: "15px", color: "#ffffff", fontSize:"1.5em", lineHeight:"1.25em" }}>
-              <Col xs={4}>PRESALE</Col>
-              <Col>
-                Wed, March 30 at 12pm ET
-                <br /><StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://docs.google.com/spreadsheets/d/1ty02P6gr8T1ARFp6HF7WMquYKOXei9v0oIXTUv-_cb0/edit#gid=0">Check if you're on the Presale list</StyledLink>
-              </Col>
-            </Row>
-            <Row style={{ paddingTop: "15px", color: "#ffffff", fontSize:"1.5em" }}>
-              <Col xs={4}>PUBLIC</Col>
-              <Col>Fri, April 1 at 12pm ET</Col>
-            </Row>
-            <Row style={{ paddingTop: "40px", color: "#ffffff", fontSize:"1.5em" }}>
-              <Col xs={4}>PRICE</Col>
-              <Col>0.25 ETH</Col>
-            </Row>
-            <Row style={{ paddingTop: "15px", color: "#ffffff", fontSize:"1.5em" }}>
-              <Col xs={4}>QUANTITY</Col>
-              <Col>450 + 50 reserved for team and marketing</Col>
-            </Row>
-          </Col>
-        </Row>
-
-        <Row style={{ paddingTop: "100px" }}>
-         <Col style={{ textAlign:"center", fontSize: "2em", color: " #ffffff" }}>
-         Lifetime access to Future NFT Mints' analysis and more
-          </Col>
-        </Row>
-        <Row style={{ paddingTop: "25px" }}>
+        
+        <a id="benefits"></a>
+        <Row style={{ paddingTop: "40px", paddingBottom: "40px", backgroundColor: "#202124" }}>
           <Col md={1}></Col>
-          <Col md={5} style={{textAlign:"center", paddingBottom:"20px"}}>
-              <img
-                alt=""
-                src="/config/images/2022-03-18-FutureNFTMints.png"
-                height="500"
-                className="d-inline-block align-top"
-                margin="10"
-              />
+          <Col md={4}>
+            <Row style={{ paddingTop:"20px", color: "#ffffff", fontSize:"2.5em", lineHeight: "1em" }}>
+              Genesis NFT Benefits
+            </Row>
+            <Row style={{ paddingTop:"20px", color: "#ffffff", fontSize:"1em", lineHeight: "1em" }}>
+              As a Genesis NFT holder, you will have access to an evolving range of benefits.
+            </Row>
           </Col>
-          <Col md={5} style={{ fontSize: "1.25em", color: " #ffffff", lineHeight: "1.25em" }}>
-            Our Genesis NFT grants lifetime access to ALL research and analysis that <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://futurenftmints.com">Future NFT Mints</StyledLink> produces. NFT owners are immediately eligible to receive our Daily Fresh Mints Newsletter ($550 / year).
-            <br /><br />In addition to our research, NFT owners will also receive 1 entry per NFT you own for any giveaway that we run. The potential prizes for these giveaways include (but not limited to) Allow List access to other NFT mints, merchandise, virtual event access, and IRL invitations. Please note that we will not run any giveaways for cash or cash-equivalent prizes.
-            <br /><br />We make no promises as to what benefits you may receive for any expansions beyond our research and analysis products. For instance, if we begin selling NFT artwork or candy bars or create a movie or anything that isn’t related to research and analytics, you won’t receive that for free.
+          <Col md={3}>
+            <Row style={{ paddingTop:"20px", color: "#ffffff", lineHeight: "1em" }}>
+              <Col xs={3}>
+                <img alt="Token Gated Platform icon" src="/config/images/TokenGatedPlatform.png" width="50px" />
+              </Col>
+              <Col>
+                <div style={{ fontSize: "1.5em" }}>
+                  Research Platform
+                </div>
+                <div style={{ paddingTop: "10px", fontSize:"1em"}}>
+                  Launching in May. Discover, research, and track upcoming and existing NFT projects.
+                </div>
+              </Col>              
+            </Row>
+            <Row style={{ paddingTop:"30px", color: "#ffffff", lineHeight: "1em" }}>
+              <Col xs={3}>
+                <img alt="Insights Report icon" src="/config/images/InsightsReport.png" width="50px" />
+              </Col>
+              <Col>
+                <div style={{ fontSize: "1.5em" }}>
+                  Insights Report
+                </div>
+                <div style={{ paddingTop: "10px", fontSize:"1em"}}>
+                  Detailed NFT research and analysis. One delivered each weekday via email. 100+ already created.
+                </div>
+              </Col>                           
+            </Row>
+            <Row style={{ paddingTop:"30px", color: "#ffffff", lineHeight: "1em" }}>
+              <Col xs={3}>
+                <img alt="Private Discord icon" src="/config/images/PrivateDiscord.png" width="50px" />
+              </Col>
+              <Col>
+                <div style={{ fontSize: "1.5em" }}>
+                  PrivateDiscord
+                </div>
+                <div style={{ paddingTop: "10px", fontSize:"1em"}}>
+                  Connect with other Genesis NFT hodlers. This is where we'll share insights ahead of time.
+                </div>
+              </Col>              
+            </Row>                       
+          </Col>
+          <Col md={3}>
+          <Row style={{ paddingTop:"20px", color: "#ffffff", lineHeight: "1em" }}>
+              <Col xs={3}>
+                <img alt="NFT Calendar icon" src="/config/images/NFTCalendar.png" width="50px" />
+              </Col>              
+              <Col>
+                <div style={{ fontSize: "1.5em" }}>
+                  NFT Calendar
+                </div>
+                <div style={{ paddingTop: "10px", fontSize:"1em"}}>
+                  Built into the Research Platform. Use <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://docs.google.com/spreadsheets/d/1ft3T2Gn-yx3P0FF2whSzkp9_nMAHiCqQZYHLKuSzg_E/edit#gid=259898129">this Google Sheet</StyledLink> until Research Platform launches.
+                </div>
+              </Col>              
+            </Row> 
+            <Row style={{ paddingTop:"30px", color: "#ffffff", lineHeight: "1em" }}>
+              <Col xs={3}>
+                <img alt="Raffle icon" src="/config/images/Raffles.png" width="50px" />
+              </Col>
+              <Col>
+                <div style={{ fontSize: "1.5em" }}>
+                  Raffles
+                </div>
+                <div style={{ paddingTop: "10px", fontSize:"1em"}}>
+                  Each Genesis NFT is an entry for Allow List access to NFTs, virtual events, and IRL invitations.
+                </div>
+              </Col>              
+            </Row>
+            <Row style={{ paddingTop:"30px", color: "#ffffff", lineHeight: "1em" }}>
+              <Col xs={3}>
+                <img alt="And more icon" src="/config/images/AndMore.png" width="50px" />
+              </Col>
+              <Col>
+                <div style={{ fontSize: "1.5em" }}>
+                  More benefits to come
+                </div>
+                <div style={{ paddingTop: "10px", fontSize:"1em"}}>
+                  Including free NFTs (+ gas) of upcoming collections, and special access within the Research Platform.
+                </div>
+              </Col>              
+            </Row>
+          </Col>
+        </Row>
+        
+        <a id="roadmap"></a>
+        <Row style={{ paddingTop: "40px", paddingBottom: "40px", backgroundColor: "#000000", textAlign: "center" }}>          
+          <Col xs={12}>
+          <img alt="Future NFT Mints roadmap" src="/config/images/roadmap.png" width="80%" />
           </Col>
         </Row>
 
-
-
-        <Row style={{ paddingTop: "75px" }}>
-
-          <Col md={3}></Col>
-          <Col md={6} xs={12} style={{ textAlign:"center", fontSize: "2em", color: " #ffffff" }}>
-            Frequently Asked Questions
-          </Col>
-          <Col md={3}></Col>
-        </Row>
-
-        <Row style={{ paddingTop: "20px", paddingBottom: "100px" }}>
-
+        <a id="team"></a>
+        <Row style={{ textAlign:"center", paddingTop: "40px", backgroundColor: "#202124", color:"#ffffff", lineHeight: "1.25em" }}>
+          <div style={{ fontSize: "2em", paddingBottom:"40px" }}>
+            The Team
+          </div>          
           <Col md={2}></Col>
-          <Col md={8} xs={12} style={{ textAlign:"left", lineHeight: "1.25em" }}>
-            <Accordion alwaysOpen>
-              <Accordion.Item eventKey="19" style={{marginBottom:"10px"}}>
-                <Accordion.Header>How much is this mint and how many Genesis NFTs will there be?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                0.25 ETH.
-                <br /><br />500. We are selling 450, and we are reserving 50 for our team and marketing.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="21" style={{marginBottom:"10px"}}>
-                <Accordion.Header>What is the royalty?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                10%. All royalties go to Future NFT Mints, Inc to fund operations.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="7" style={{marginBottom:"10px"}}>
-                <Accordion.Header>What is an NFT?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                ‘NFT’ is an acronym that stands for Non-Fungible Token. An NFT is a digital record that cannot be taken away and is publicly viewable. The technology that makes this possible is the blockchain and smart contracts. If you’re looking to learn more about NFTs, we have a <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://futurenftmints.com/web3-resources.html">resources page</StyledLink> with links to some of the best minds in the space who explain everything in more detail.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="9" style={{marginBottom:"10px"}}>
-                <Accordion.Header>Why did you choose to mint your NFT on Ethereum?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                As of March 2022, Ethereum is the most widely-used blockchain for NFTs. Our primary goal was creating an accessible NFT. Ethereum has known energy consumption issues that are actively being worked on with ETH2.0. If environmental issues are not addressed by Ethereum (at a blockchain level at some point in the future) we can always perform a swap of this Genesis NFT on Ethereum for an equal Genesis NFT on an L2 or other blockchain that is more environmentally friendly. But, as of March 2022, the infrastructure and support for every other blockchains is significantly behind Ethereum meaning that we would have to accept a subpar user experience or secondary market, which was the primary factor in our decision to mint on Ethereum.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="10" style={{marginBottom:"10px"}}>
-                <Accordion.Header>What wallet is supported for this mint?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                MetaMask is the only supported wallet.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="11" style={{marginBottom:"10px"}}>
-                <Accordion.Header>Can I mint from my phone?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                While this mint page has been mobile optimized, we have only performed testing on the desktop version. No promises that the mobile version will work.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="12" style={{marginBottom:"10px"}}>
-                <Accordion.Header>How do I mint a FNFTM Genesis NFT?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                You will need a MetaMask wallet with enough ETH to cover the mint cost (0.25 per NFT) + gas and we recommend that you mint from a laptop or desktop. We performed our testing using the Chrome browser.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="13" style={{marginBottom:"10px"}}>
-                <Accordion.Header>What kind of smart contract was used for the FNFTM Genesis NFT?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                Our smart contract was built starting with the <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://twitter.com/futurenftmints/status/1480600385639182337?s=20&t=iGiwdDCZKmvRDHHfg-ow3g">gas-efficient ERC-721A contract that Azuki pioneered</StyledLink>.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="14" style={{marginBottom:"10px"}}>
-                <Accordion.Header>What is the Allow List?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                The Allow List practically guarantees that you can mint this NFT. If everyone on the list mints AND they mint their total allocation (2 NFTs), then we will run out of NFTs. But we’d basically be the first NFT that everyone who signed up did their mint at the full allocation. The Allow List opens up on March 28 at 12pm ET and those on the list have 48 hours to mint.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="15" style={{marginBottom:"10px"}}>
-                <Accordion.Header>How do I get on the Allow List?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                There are 3 raffles (two require you owning an NFT to be eligible) being run to get a spot on our Allow List. You must submit your email address to be eligible for our raffles.
-                <br /><br />Token-gated raffles: Our frens at Club CPG have 80 spots and our frens at Floor have 40 spots. To be eligible for these raffles, you must own their NFT and submit via their Telegram and Discord, respectively.
-                <br /><br />Public raffle: To be eligible for the public raffle, you will need to <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://discord.gg/futurenftmints">join the Future NFT Mints Discord</StyledLink> and sign up for the raffle. Everyone with the ‘Early Supporter’ status in Discord (already given out and no one else can earn it) will receive 10 raffle spots. Everyone else will receive 1 raffle spot.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="16" style={{marginBottom:"10px"}}>
-              <Accordion.Header>What is the Presale?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                The Presale is a 48 hour time period between the Allow List and Public mint that gives everyone who submitted their wallet for one of our 3 raffles a space to mint. It is intended to give our supporters an opportunity to mint while not having to worry about bots.
-                <br /><br />Unlike the Allow List, there is no cap to how many people are eligible for the Presale. If all 1K+ Floor owners signup for the raffle, then 1K+ wallets will be on the Presale. Same thing if a surge of people join our Discord for the public raffle.
-                <br /><br />The Presale does not guarantee you’ll be able to mint, but it does mean you won’t be competing with bots.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="17" style={{marginBottom:"10px"}}>
-                <Accordion.Header>How do I get on the Presale?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                Submit your wallet and info to one of the 3 raffles we are running with Club CPG, Floor, or in our Discord, and you are automatically on the Presale.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="18" style={{marginBottom:"10px"}}>
-                <Accordion.Header>Why do you require our email address to join the raffles for Allow List and Presale spots?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                The Genesis NFT’s primary benefit is that you receive our daily fresh mints newsletter, which is sent via email. It will speed up our ability to onboard NFT owners if we know your wallet and email ahead of time. Otherwise, you will have to take an extra step after you mint in order to get the bulk of your benefits. We will also send you emails before the key mint dates so that you can make sure to be ready.
-                <br /><br />We will not send any additional communications to these emails, so if you want to be on our free newsletter, you’ll have to signup for that separately.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="22" style={{marginBottom:"10px"}}>
-                <Accordion.Header>How much money will this mint generate?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                Assuming we sell all Genesis NFTs: 450 * 0.25 = 112.5 ETH. At $2.5K USD/ETH, that’s $281,250.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="23" style={{marginBottom:"10px"}}>
-                <Accordion.Header>How will the money earned in this mint be used?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                All the money earned from the Genesis Mint will be accounted as revenue for Future NFT Mints, Inc, and it will be used to fund our business. Since these funds are accounted as revenue, Future NFT Mints, Inc may also be required to use some of the funds to pay for taxes.
-                </Accordion.Body>
-              </Accordion.Item>
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Elliot Koss" src="/config/images/team/elliotkoss-founder-futurenftmints.png" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Elliot Koss</div>
+            Founder
+            <br /><a href="https://twitter.com/elliotkoss" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://linkedin.com/in/elliotkoss" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Mike Taylor" src="/config/images/team/miketaylor-engineer-futurenftmints.jpeg" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Mike Taylor</div>
+            Senior Engineer
+            <br /><a href="https://twitter.com/sea_local" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://linkedin.com/in/miketayloreit" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Samantha Lane" src="/config/images/team/samanthalane-designer-futurenftmints.jpeg" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Samantha Lane</div>
+            Designer
+            <br /><a href="https://twitter.com/laneyx" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://www.linkedin.com/in/samanthajlane/" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Mason Tilghman" src="/config/images/team/masontilghman-engineer-futurenftmints.jpeg" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Mason Tilghman</div>
+            Engineer
+            <br /><a href="https://twitter.com/mas1alpha" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://www.linkedin.com/in/mason-tilghman/" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>
+        </Row>
 
-              <Accordion.Item eventKey="25" style={{marginBottom:"10px"}}>
-                <Accordion.Header>What is the roadmap?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                For the next 12 months, our sole focus is building FNFTM into the premiere NFT research and analysis platform. This started with our Insights Report and Premium Analysis, has already expanded to a daily free and paid newsletter plus a weekly video recap of the mints we cover, and we are putting together plans to create a token-gated website.
-                <br /><br />There are no timelines for when we plan to deliver things. Since our first tweet on Nov 29, 2021, we have quietly iterated, making progressively better improvements to our product offering, and the plan is to continue in that direction. But we don’t want to commit to specific dates or timelines at this point since our big picture plans are still coming into focus.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="26" style={{marginBottom:"10px"}}>
-                <Accordion.Header>Who’s the team building FNFTM?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://futurenftmints.com#team">Meet the public team and check out our LinkedIn and Twitter accounts on our main website.</StyledLink>
-                <br /><br />As of March 2022, our founder (Elliot) is the only person working full-time on FNFTM at this time. Everyone else is working part-time. This will change quickly once we sell 50% of our Genesis NFTs.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="27" style={{marginBottom:"10px"}}>
-                <Accordion.Header>How can I buy or sell the FNFTM Genesis NFT after the mint?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://opensea.io/collection/future-nft-mints-genesis-nft">OpenSea</StyledLink>. We recommend that you only use our official links since OpenSea does a bad job removing fake listings.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="28" style={{marginBottom:"10px"}}>
-                <Accordion.Header>I own the NFT, how will you send me my tshirt?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                We will be taking a snapshot on Mon, Apr 4, 2022 at 12pm ET, and each NFT entitles the owner to 1 T-shirt. If you own 5 NFTs, you get 5 T-shirts.
-                <br /><br />To make sure that we have your shipping info, please go to <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://register.futurenftmints.com">register.futurenftmints.com</StyledLink> and follow the instructions.
-                <br /><br />If we don’t have your shipping info by April 11, 2022 at 12pm ET, we won’t order you a shirt.
-                <br /><br />We will order the tshirts on April 13, 2022, and we expect to ship them out to you in early May 2022. Supply chains take time, and shipping up to 500 shirts is a ton of shipping labels to assemble.
-                <br /><br />If our mint does not sell out by Mon, Apr 4, 2022, we will do a second snapshot. Those details will be TBD.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="30" style={{marginBottom:"10px"}}>
-                <Accordion.Header>I bought the NFT, but I want to register a different email address to receive the email. What do I do?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                Go to <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://register.futurenftmints.com">register.futurenftmints.com</StyledLink> and follow the instructions.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="31" style={{marginBottom:"10px"}}>
-                <Accordion.Header>What happens if this NFT does not sell out in its first few days?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                We may not build as fast, but we will continue to build. Elliot, the founder, has a 12-month runway secured in the event the mint doesn’t sell out quickly, and this NFT mint page will stay live the entire time. If, after 12 months, this business doesn’t generate enough value to sell out this NFT, Elliot will figure out the next step. But like any entrepreneur, he will likely iterate, iterate, and iterate well before that happens. And if this concept doesn’t hit the spot, he can always pivot. But this is a scenario that is 12 months out, and as Humphrey Bogart from Casablanca said, “I never make plans that far ahead.”
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="0" style={{marginBottom:"10px"}}>
-                <Accordion.Header>Do Future NFT Mints Genesis NFT owners own part of Future NFT Mints?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
+        <Row style={{ textAlign:"center", paddingBottom: "40px", backgroundColor: "#202124", color:"#ffffff" }}>     
+          <Col md={2}></Col>
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Sunny Sahota" src="/config/images/team/sunnysahota-marketer-nft-researcher-futurenftmints.jpeg" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Sunny Sahota</div>
+            Marketing / Research
+            <br /><a href="https://twitter.com/_sunnysahota" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://www.linkedin.com/in/ssahota/" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Mike Taylor" src="/config/images/team/krishnabrahmaroutu-nft-researcher-futurenftmints.jpg" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Krishna Brahmaroutu</div>
+            NFT Reseacher
+            <br /><a href="https://twitter.com/krishnaenae" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://www.linkedin.com/mwlite/in/krishna-brahmaroutu-926251186" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Harrison Smith" src="/config/images/team/harrisonsmith-nft-researcher-futurenftmints.jpeg" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Harrison Smith</div>
+            NFT Researcher
+            <br /><a href="https://twitter.com/hgrey0001" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://www.linkedin.com/in/harrisongsmith/" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Andrew Cosgrove" src="/config/images/team/andrewcosgrove-legaladvisor-futurenftmints.jpeg" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Andrew Cosgrove</div>
+            Legal Advisor
+            <br /><a href="https://twitter.com/AndrewTCosgrove" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://www.linkedin.com/in/andrew-cosgrove-26062784/" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>
+        </Row>
+                
+        <Row style={{ paddingTop: "40px", paddingBottom: "40px", backgroundColor: "#000000", textAlign: "center" }}>          
+          <div style={{ fontSize: "2em", paddingBottom:"5px", color:"#ffffff" }}>
+            Funding Milestones                       
+          </div>  
+          <div style={{ fontSize: "1em", paddingBottom:"40px", color:"#ffffff"}}>as of Apr 26, 2022</div>
+          <Col xs={12}>
+            <img alt="Future NFT Mints funding milestones" src="/config/images/fundingMilestones.png" width="80%" />
+          </Col>
+        </Row>
+
+        <Row fluid style={{ backgroundImage: "linear-gradient(#000000 10%, #A11692, #BD2164)"}}>
+          <Row>
+            <Col md={3}></Col>
+            <Col xs={12} md={7}>
+              <Row style={{ paddingTop: "80px", color: "#ffffff", fontSize:"1.5em", lineHeight:"1.25em" }}>
+                <Col xs={4}>ALLOW LIST</Col>
+                <Col>
+                  Mon, March 28 at 12pm ET                
+                </Col>
+              </Row>
+              <Row style={{ paddingTop: "15px", color: "#ffffff", fontSize:"1.5em", lineHeight:"1.25em" }}>
+                <Col xs={4}>PRESALE</Col>
+                <Col>
+                  Wed, March 30 at 12pm ET                
+                </Col>
+              </Row>
+              <Row style={{ paddingTop: "15px", color: "#ffffff", fontSize:"1.5em" }}>
+                <Col xs={4}>PUBLIC</Col>
+                <Col>Fri, April 1 at 12pm ET</Col>
+              </Row>
+              <Row style={{ paddingTop: "40px", color: "#ffffff", fontSize:"1.5em" }}>
+                <Col xs={4}>PRICE</Col>
+                <Col>0.25 ETH</Col>
+              </Row>
+              <Row style={{ paddingTop: "15px", color: "#ffffff", fontSize:"1.5em" }}>
+                <Col xs={4}>QUANTITY</Col>
+                <Col>450 + 50 reserved for team and marketing</Col>
+              </Row>
+            </Col>
+          </Row>
+
+          <Row style={{ paddingTop: "100px" }}>
+          <Col style={{ textAlign:"center", fontSize: "2em", color: " #ffffff" }}>
+          Lifetime access to Future NFT Mints' analysis and more
+            </Col>
+          </Row>
+          <Row style={{ paddingTop: "25px" }}>
+            <Col md={1}></Col>
+            <Col md={5} style={{textAlign:"center", paddingBottom:"20px"}}>
+                <img
+                  alt=""
+                  src="/config/images/2022-03-18-FutureNFTMints.png"
+                  height="500"
+                  className="d-inline-block align-top"
+                  margin="10"
+                />
+            </Col>
+            <Col md={5} style={{ fontSize: "1.25em", color: " #ffffff", lineHeight: "1.25em" }}>
+              Our Genesis NFT grants lifetime access to ALL research and analysis that <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://futurenftmints.com">Future NFT Mints</StyledLink> produces. NFT owners are immediately eligible to receive our Daily Fresh Mints Newsletter ($550 / year).
+              <br /><br />In addition to our research, NFT owners will also receive 1 entry per NFT you own for any giveaway that we run. The potential prizes for these giveaways include (but not limited to) Allow List access to other NFT mints, merchandise, virtual event access, and IRL invitations. Please note that we will not run any giveaways for cash or cash-equivalent prizes.
+              <br /><br />We make no promises as to what benefits you may receive for any expansions beyond our research and analysis products. For instance, if we begin selling NFT artwork or candy bars or create a movie or anything that isn’t related to research and analytics, you won’t receive that for free.
+            </Col>
+          </Row>
+
+
+          <a id="faqs"></a>
+          <Row style={{ paddingTop: "75px" }}>
+
+            <Col md={3}></Col>
+            <Col md={6} xs={12} style={{ textAlign:"center", fontSize: "2em", color: " #ffffff" }}>
+              Frequently Asked Questions
+            </Col>
+            <Col md={3}></Col>
+          </Row>
+
+          <Row style={{ paddingTop: "20px", paddingBottom: "100px" }}>
+
+            <Col md={2}></Col>
+            <Col md={8} xs={12} style={{ textAlign:"left", lineHeight: "1.25em" }}>
+              <Accordion alwaysOpen>
+                <Accordion.Item eventKey="19" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>How much is this mint and how many Genesis NFTs will there be?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  0.25 ETH.
+                  <br /><br />500. We are selling 450, and we are reserving 50 for our team and marketing.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="21" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>What is the royalty?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  10%. All royalties go to Future NFT Mints, Inc to fund operations.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="7" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>What is an NFT?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  ‘NFT’ is an acronym that stands for Non-Fungible Token. An NFT is a digital record that cannot be taken away and is publicly viewable. The technology that makes this possible is the blockchain and smart contracts. If you’re looking to learn more about NFTs, we have a <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://futurenftmints.com/web3-resources.html">resources page</StyledLink> with links to some of the best minds in the space who explain everything in more detail.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="9" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>Why did you choose to mint your NFT on Ethereum?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  As of March 2022, Ethereum is the most widely-used blockchain for NFTs. Our primary goal was creating an accessible NFT. Ethereum has known energy consumption issues that are actively being worked on with ETH2.0. If environmental issues are not addressed by Ethereum (at a blockchain level at some point in the future) we can always perform a swap of this Genesis NFT on Ethereum for an equal Genesis NFT on an L2 or other blockchain that is more environmentally friendly. But, as of March 2022, the infrastructure and support for every other blockchains is significantly behind Ethereum meaning that we would have to accept a subpar user experience or secondary market, which was the primary factor in our decision to mint on Ethereum.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="10" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>What wallet is supported for this mint?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  MetaMask is the only supported wallet.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="11" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>Can I mint from my phone?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  While this mint page has been mobile optimized, we have only performed testing on the desktop version. No promises that the mobile version will work.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="12" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>How do I mint a FNFTM Genesis NFT?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  You will need a MetaMask wallet with enough ETH to cover the mint cost (0.25 per NFT) + gas and we recommend that you mint from a laptop or desktop. We performed our testing using the Chrome browser.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="13" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>What kind of smart contract was used for the FNFTM Genesis NFT?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  Our smart contract was built starting with the <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://twitter.com/futurenftmints/status/1480600385639182337?s=20&t=iGiwdDCZKmvRDHHfg-ow3g">gas-efficient ERC-721A contract that Azuki pioneered</StyledLink>.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="14" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>What is the Allow List?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  The Allow List practically guarantees that you can mint this NFT. If everyone on the list mints AND they mint their total allocation (2 NFTs), then we will run out of NFTs. But we’d basically be the first NFT that everyone who signed up did their mint at the full allocation. The Allow List opens up on March 28 at 12pm ET and those on the list have 48 hours to mint.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="15" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>How do I get on the Allow List?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  There are 3 raffles (two require you owning an NFT to be eligible) being run to get a spot on our Allow List. You must submit your email address to be eligible for our raffles.
+                  <br /><br />Token-gated raffles: Our frens at Club CPG have 80 spots and our frens at Floor have 40 spots. To be eligible for these raffles, you must own their NFT and submit via their Telegram and Discord, respectively.
+                  <br /><br />Public raffle: To be eligible for the public raffle, you will need to <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://discord.gg/futurenftmints">join the Future NFT Mints Discord</StyledLink> and sign up for the raffle. Everyone with the ‘Early Supporter’ status in Discord (already given out and no one else can earn it) will receive 10 raffle spots. Everyone else will receive 1 raffle spot.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="16" style={{marginBottom:"10px"}}>
+                <Accordion.Header>What is the Presale?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  The Presale is a 48 hour time period between the Allow List and Public mint that gives everyone who submitted their wallet for one of our 3 raffles a space to mint. It is intended to give our supporters an opportunity to mint while not having to worry about bots.
+                  <br /><br />Unlike the Allow List, there is no cap to how many people are eligible for the Presale. If all 1K+ Floor owners signup for the raffle, then 1K+ wallets will be on the Presale. Same thing if a surge of people join our Discord for the public raffle.
+                  <br /><br />The Presale does not guarantee you’ll be able to mint, but it does mean you won’t be competing with bots.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="17" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>How do I get on the Presale?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  Submit your wallet and info to one of the 3 raffles we are running with Club CPG, Floor, or in our Discord, and you are automatically on the Presale.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="18" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>Why do you require our email address to join the raffles for Allow List and Presale spots?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  The Genesis NFT’s primary benefit is that you receive our daily fresh mints newsletter, which is sent via email. It will speed up our ability to onboard NFT owners if we know your wallet and email ahead of time. Otherwise, you will have to take an extra step after you mint in order to get the bulk of your benefits. We will also send you emails before the key mint dates so that you can make sure to be ready.
+                  <br /><br />We will not send any additional communications to these emails, so if you want to be on our free newsletter, you’ll have to signup for that separately.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="22" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>How much money will this mint generate?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  Assuming we sell all Genesis NFTs: 450 * 0.25 = 112.5 ETH. At $2.5K USD/ETH, that’s $281,250.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="23" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>How will the money earned in this mint be used?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  All the money earned from the Genesis Mint will be accounted as revenue for Future NFT Mints, Inc, and it will be used to fund our business. Since these funds are accounted as revenue, Future NFT Mints, Inc may also be required to use some of the funds to pay for taxes.
+                  </Accordion.Body>
+                </Accordion.Item>
+
+                <Accordion.Item eventKey="25" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>What is the roadmap?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  For the next 12 months, our sole focus is building FNFTM into the premiere NFT research and analysis platform. This started with our Insights Report and Premium Analysis, has already expanded to a daily free and paid newsletter plus a weekly video recap of the mints we cover, and we are putting together plans to create a token-gated website.
+                  <br /><br />There are no timelines for when we plan to deliver things. Since our first tweet on Nov 29, 2021, we have quietly iterated, making progressively better improvements to our product offering, and the plan is to continue in that direction. But we don’t want to commit to specific dates or timelines at this point since our big picture plans are still coming into focus.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="26" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>Who’s the team building FNFTM?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://futurenftmints.com#team">Meet the public team and check out our LinkedIn and Twitter accounts on our main website.</StyledLink>
+                  <br /><br />As of March 2022, our founder (Elliot) is the only person working full-time on FNFTM at this time. Everyone else is working part-time. This will change quickly once we sell 50% of our Genesis NFTs.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="27" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>How can I buy or sell the FNFTM Genesis NFT after the mint?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://opensea.io/collection/future-nft-mints-genesis-nft">OpenSea</StyledLink>. We recommend that you only use our official links since OpenSea does a bad job removing fake listings.
+                  </Accordion.Body>
+                </Accordion.Item>                
+                <Accordion.Item eventKey="30" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>I bought the NFT, but I want to register a different email address to receive the email. What do I do?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  Go to <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://register.futurenftmints.com">register.futurenftmints.com</StyledLink> and follow the instructions.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="31" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>What happens if this NFT does not sell out in its first few days?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  We may not build as fast, but we will continue to build. Elliot, the founder, has a 12-month runway secured in the event the mint doesn’t sell out quickly, and this NFT mint page will stay live the entire time. If, after 12 months, this business doesn’t generate enough value to sell out this NFT, Elliot will figure out the next step. But like any entrepreneur, he will likely iterate, iterate, and iterate well before that happens. And if this concept doesn’t hit the spot, he can always pivot. But this is a scenario that is 12 months out, and as Humphrey Bogart from Casablanca said, “I never make plans that far ahead.”
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="0" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>Do Future NFT Mints Genesis NFT owners own part of Future NFT Mints?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                    No.
+                    <br /><br />The FNFTM Genesis NFT does not give ANY ownership of Future NFT Mints. As a part of the FNFTM Genesis NFT, you will NOT receive lotteries, annuities, royalties, dividends, revenue share, and equity ownership.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="1" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>Who owns and is responsible for Future NFT Mints?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  As of March 2022, Elliot Koss (<StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://www.linkedin.com/in/elliotkoss/">LinkedIn</StyledLink>, <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://twitter.com/elliotkoss/">Twitter</StyledLink>) is Founder / CEO and  the 100% equity owner of Future NFT Mints, Inc, the Austin-based, Delaware C-corp that owns and operates Future NFT Mints.
+                  <br /><br />At the conclusion of the Genesis Mint, Elliot Koss will remain the 100% equity owner of Future NFT Mints, Inc.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="2" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>Can I invest in Future NFT Mints, Inc?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  As of March 2022, Future NFT Mints is not seeking investment, but Elliot is writing a monthly update to begin creating a track record with accredited investors (angels and VCs) so that if there is ever a valid reason to raise a round, there are investors who are already familiar with the business and its operations to move quickly while providing a fair valuation for the raise.
+                  <br /><br />If you’re an accredited investor and would like to receive the monthly investor update, please <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://twitter.com/elliotkoss">DM Elliot on Twitter</StyledLink> with your email and a note about the investor update.
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="3" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>If I buy a FNFTM Genesis NFT, am I a shareholder?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
                   No.
-                  <br /><br />The FNFTM Genesis NFT does not give ANY ownership of Future NFT Mints. As a part of the FNFTM Genesis NFT, you will NOT receive lotteries, annuities, royalties, dividends, revenue share, and equity ownership.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="1" style={{marginBottom:"10px"}}>
-                <Accordion.Header>Who owns and is responsible for Future NFT Mints?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                As of March 2022, Elliot Koss (<StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://www.linkedin.com/in/elliotkoss/">LinkedIn</StyledLink>, <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://twitter.com/elliotkoss/">Twitter</StyledLink>) is Founder / CEO and  the 100% equity owner of Future NFT Mints, Inc, the Austin-based, Delaware C-corp that owns and operates Future NFT Mints.
-                <br /><br />At the conclusion of the Genesis Mint, Elliot Koss will remain the 100% equity owner of Future NFT Mints, Inc.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="2" style={{marginBottom:"10px"}}>
-                <Accordion.Header>Can I invest in Future NFT Mints, Inc?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                As of March 2022, Future NFT Mints is not seeking investment, but Elliot is writing a monthly update to begin creating a track record with accredited investors (angels and VCs) so that if there is ever a valid reason to raise a round, there are investors who are already familiar with the business and its operations to move quickly while providing a fair valuation for the raise.
-                <br /><br />If you’re an accredited investor and would like to receive the monthly investor update, please <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://twitter.com/elliotkoss">DM Elliot on Twitter</StyledLink> with your email and a note about the investor update.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="3" style={{marginBottom:"10px"}}>
-                <Accordion.Header>If I buy a FNFTM Genesis NFT, am I a shareholder?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                No.
-                </Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="5" style={{marginBottom:"10px"}}>
-                <Accordion.Header>If I buy a FNFTM Genesis NFT, do I get to vote on how FNFTM operates?</Accordion.Header>
-                <Accordion.Body style={{color:"#fff"}}>
-                No. We may ask you for input, the same way any startup asks their customers what they would like so that we build a product that has good product market fit. But we will not ask NFT owners (simply because they own our NFT) for their opinion on how we operate. Many of our most treasured advisors may own our NFT, but we will seek their advice independent of their NFT ownership.
-                </Accordion.Body>
-              </Accordion.Item>
-            </Accordion>
-          </Col>
-          <Col md={2}></Col>
+                  </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="5" style={{marginBottom:"10px"}}>
+                  <Accordion.Header>If I buy a FNFTM Genesis NFT, do I get to vote on how FNFTM operates?</Accordion.Header>
+                  <Accordion.Body style={{color:"#fff"}}>
+                  No. We may ask you for input, the same way any startup asks their customers what they would like so that we build a product that has good product market fit. But we will not ask NFT owners (simply because they own our NFT) for their opinion on how we operate. Many of our most treasured advisors may own our NFT, but we will seek their advice independent of their NFT ownership.
+                  </Accordion.Body>
+                </Accordion.Item>
+              </Accordion>
+            </Col>
+            <Col md={2}></Col>
+          </Row>
         </Row>
 
 
