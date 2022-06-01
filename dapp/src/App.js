@@ -496,8 +496,9 @@ function App() {
           <Col md={1}></Col>
           <Col md={6}>            
             <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"3em", lineHeight: "1em" }}>
-              <Col>Guide your buying decisions with access to</Col>
+              <Col>Guide your buying decisions with access to<br />the most in-depth NFT research and analysis</Col>
             </Row>
+            {/*
             <Row style={{ backgroundImage: "linear-gradient(0.15turn, #A11692, #BD2164, #FAC921 60%)", 
                           WebkitBackgroundClip: "text",
                           WebkitTextFillColor: "transparent",
@@ -505,6 +506,7 @@ function App() {
                           lineHeight: "1em" }}>
               <Col>the most in-depth NFT research and analysis</Col>
             </Row>
+            */}
             <Row style={{ paddingTop: "20px" }}>
               <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"1.5em" }}>
                 <Col>At Future NFT Mints, we know that it can be hard keeping up with upcoming mint dates and 
