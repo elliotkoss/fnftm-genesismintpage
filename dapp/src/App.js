@@ -397,10 +397,9 @@ function App() {
     </> : null
   }
 
-  return (
-    <>      
+  const header = () => {
 
-      <Navbar collapseOnSelect expand="lg" variant="dark" style={{backgroundColor: "#000000" }}>
+    return <Navbar collapseOnSelect expand="lg" variant="dark" style={{backgroundColor: "#000000", position:"fixed", width:"100%", zIndex:"100" }}>
         <Container>
           <Navbar.Brand href="#home">
             <img
@@ -456,6 +455,9 @@ function App() {
                   className="d-inline-block align-top"
                 />
               </Nav.Link>
+              <Nav.Link target={"_blank"} href="https://app.futurenftmints.com">
+                <span className="btn-sm btn-light text-center">Register</span>
+              </Nav.Link>
             
 
             
@@ -490,9 +492,17 @@ function App() {
         </Container>
       </Navbar>
       
+}
+
+  return (
+    <>      
+
+      {header()}
+      
 
       <Container fluid>
-        <Row style={{ paddingTop: "50px", paddingBottom: "40px", backgroundColor: "#000000" }}>
+
+        <Row style={{ paddingTop: "50px", paddingBottom: "20px", backgroundColor: "#000000" }}>
           <Col md={1}></Col>
           <Col md={6}>            
             <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"3em", lineHeight: "1em" }}>
@@ -582,16 +592,29 @@ function App() {
           </Col>
           <Col md={1}></Col>
         </Row>
+        <Row style={{textAlign:"center", background:"#000000"}}>
+          <Col style={{fontSize:"2em", marginTop:"30px", marginBottom:"50px", color:"#ffffff"}}>
+            Sign-up for our
+            <div style={{ marginTop:"10px"}}>
+              <a className="btn-lg btn-light" style={{ textDecoration:"none", marginTop:"10px"}} target={"_blank"} href="https://futurenftmints.substack.com/subscribe">free newsletter</a>
+            </div>
+          </Col>
+        </Row>          
         
         <a id="benefits"></a>
         <Row style={{ paddingTop: "40px", paddingBottom: "40px", backgroundColor: "#202124" }}>
           <Col md={1}></Col>
           <Col md={4}>
             <Row style={{ paddingTop:"20px", color: "#ffffff", fontSize:"2.5em", lineHeight: "1em" }}>
-              Genesis NFT Benefits
+              <Col>Genesis NFT Benefits</Col>
             </Row>
             <Row style={{ paddingTop:"20px", color: "#ffffff", fontSize:"1em", lineHeight: "1em" }}>
-              As a Genesis NFT holder, you will have access to an evolving range of benefits.
+              <Col>As a Genesis NFT holder, you will have access to an evolving range of benefits.</Col>
+            </Row>
+            <Row style={{ paddingTop:"40px", paddingBottom:"20px", color: "#ffffff", fontSize:"1em", lineHeight: "1em" }}>
+              <Col>
+                <a className="btn-lg btn-light" style={{textDecoration:"none"}} target="_BLANK" href="https://app.futurenftmints.com">Register Your Genesis NFT</a>
+              </Col>
             </Row>
           </Col>
           <Col md={3}>
@@ -627,7 +650,7 @@ function App() {
               </Col>
               <Col>
                 <div style={{ fontSize: "1.5em" }}>
-                  PrivateDiscord
+                  Private Discord
                 </div>
                 <div style={{ paddingTop: "10px", fontSize:"1em"}}>
                   Connect with other Genesis NFT hodlers. This is where we'll share insights ahead of time.
@@ -636,7 +659,7 @@ function App() {
             </Row>                       
           </Col>
           <Col md={3}>
-          <Row style={{ paddingTop:"20px", color: "#ffffff", lineHeight: "1em" }}>
+            <Row style={{ paddingTop:"20px", color: "#ffffff", lineHeight: "1em" }}>
               <Col xs={3}>
                 <img alt="NFT Calendar icon" src="/config/images/NFTCalendar.png" width="50px" />
               </Col>              
@@ -674,19 +697,235 @@ function App() {
                   Including free NFTs (+ gas) of upcoming collections, and special access within the Research Platform.
                 </div>
               </Col>              
-            </Row>
+            </Row>            
           </Col>
         </Row>
         
         <a id="roadmap"></a>
-        <Row style={{ paddingTop: "40px", paddingBottom: "40px", backgroundColor: "#000000", textAlign: "center" }}>          
-          <Col xs={12}>
-          <img alt="Future NFT Mints roadmap" src="/config/images/roadmap.png" width="80%" />
+        <Row style={{backgroundColor:"#000000"}}>
+          <Col>
+            <Row style={{ paddingTop:"50px", paddingBottom:"25px", fontSize:"2em", textAlign:"center", color:"#ffffff"}}>
+              <div>Roadmap</div>
+            </Row>
+            <Row>
+              <div className="timeline">          
+                
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    November 2021
+                  </div>
+                  <div className="timeline-content">
+                    <div>
+                      <a style={{ color:"#ffffff", fontSize:"1.25em"}} href="https://twitter.com/futurenftmints/status/1465334744044900358" >First tweet</a>                                        
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-success text-black" style={{ width:"120px"}} >
+                        Done
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    December 2021
+                  </div>
+                  <div className="timeline-content">
+                    <div>
+                      <a style={{ color:"#ffffff", fontSize:"1.25em"}} href="https://twitter.com/futurenftmints/status/1466421911118761984" >First Insights Report Analysis</a>                                        
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-success text-black" style={{ width:"120px"}} >
+                        Done
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    January 2022
+                  </div>
+                  <div className="timeline-content">
+                    <div>
+                      <a style={{ color:"#ffffff", fontSize:"1.25em"}} href="https://futurenftmints.substack.com/subscribe" >Start Free and Paid Newsletter</a>                                        
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-success text-black" style={{ width:"120px"}} >
+                        Done
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    February 2022
+                  </div>
+                  <div className="timeline-content">
+                    <div>
+                      <a style={{ color:"#ffffff", fontSize:"1.25em"}} href="#team" >Recruit Team</a>                                        
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-success text-black" style={{ width:"120px"}} >
+                        Done
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    March 2022
+                  </div>
+                  <div className="timeline-content">
+                    <div>
+                      <a style={{ color:"#ffffff", fontSize:"1.25em"}} href="https://mint.futurenftmints.com" >NFT Smart Contract and Genesis Mint Page Launch</a>                                        
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-success text-black" style={{ width:"120px"}} >
+                        Done
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    April 2022
+                  </div>
+                  <div className="timeline-content">
+                    <div style={{ color:"#ffffff", fontSize:"1.25em"}}>
+                      Design NFT Research Platform                                        
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-success text-black" style={{ width:"120px"}} >
+                        Done
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    May 2022
+                  </div>
+                  <div className="timeline-content">
+                    <div style={{ color:"#ffffff" }}>
+                    <a style={{ color:"#ffffff", fontSize:"1.25em"}} href="https://app.futurenftmints.com" >Launch Token Gated Registration</a>
+                      <div className="text-center" style={{ marginTop:"20px"}}>
+                        <div>
+                          <iframe width="240" src="https://www.youtube.com/embed/4rkwU8tcEZY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-success text-black" style={{ width:"120px"}} >
+                        Done
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    June 2022
+                  </div>
+                  <div className="timeline-content">
+                    <div style={{ color:"#ffffff" }}>
+                        <div style={{fontSize:"1.25em"}}>Community-Driven Mint Calendar</div>
+                        <div style={{ fontSize:"1em", marginTop:"10px"}}>
+                          <ul>
+                            <li>- Upvote and downvote upcoming NFTs</li>
+                            <li>- Access all research and insights in the token gated platform</li>
+                            <li>- Add upcoming NFT projects and we'll research them</li>
+                          </ul>
+                        </div>
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-warning text-black" style={{ width:"120px"}} >
+                        In Progress
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    July 2022
+                  </div>
+                  <div className="timeline-content">
+                    <div style={{ color:"#ffffff" }}>
+                        <div style={{fontSize:"1.25em"}}>Community Sentiment, Search, and More Research</div>
+                        <div style={{ fontSize:"1em", marginTop:"10px"}}>
+                          <ul>
+                            <li>- Specific NFT-community sentiment</li>
+                            <li>- Advanced filters, search, and sorting of NFT projects</li>
+                            <li>- NFT Collection pages</li>
+                          </ul>
+                        </div>
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-light text-black" style={{ width:"120px"}} >
+                        Planned
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+
+                <div className="timeline-row">
+                  <div className="timeline-time">
+                    August 2022
+                  </div>
+                  <div className="timeline-content">
+                    <div style={{ color:"#ffffff" }}>
+                        <div style={{fontSize:"1.25em"}}>Profile Page, Multiple Wallets, and new NFT for 1-year access</div>
+                        <div style={{ fontSize:"1em", marginTop:"10px"}}>
+                          <ul>
+                            <li>- User profile pages</li>
+                            <li>- Add multiple wallets</li>
+                            <li>- Mint new NFT (supply and price TBD) - Genesis NFT receives 1 for free</li>
+                          </ul>
+                        </div>
+                    </div>
+                    <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
+                      <span className="badge bg-light text-black" style={{ width:"120px"}} >
+                        Planned
+                      </span>     
+                    </div>               
+                  </div>
+                </div>
+                
+              </div>              
+
+            </Row>
+            <Row>
+              <div style={{ padding:"0px 10px", marginBottom:"50px"}}>
+                <div className="timeline-future">
+                  <div className="row">
+                    <div className="col-md-3"></div>
+                    <div className="col-md-6 col-12" style={{ background: "#1a233a", borderRadius: "4px", padding: "20px 30px" }}>
+                        <div className="row" style={{fontSize:"1.5em", color:"#ffffff", textAlign:"center"}}>
+                          <div>Phase 2</div>
+                        </div>
+                        <div className="row" style={{fontSize:"1em", color:"#ffffff", textAlign:"center", marginTop:"20px"}}>
+                          <div>To be announced</div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Row>
           </Col>
         </Row>
+        <div className="col-12" style={{backgroundColor:"#000000", width:"100%"}}>          
+          <div className="row">
+            
+          </div>
+        </div>        
 
         <a id="team"></a>
-        <Row style={{ textAlign:"center", paddingTop: "40px", backgroundColor: "#202124", color:"#ffffff", lineHeight: "1.25em" }}>
+        <Row style={{ textAlign:"center", paddingTop: "40px", paddingBottom:"20px", backgroundColor: "#202124", color:"#ffffff", lineHeight: "1.25em" }}>
           <div style={{ fontSize: "2em", paddingBottom:"40px" }}>
             The Team
           </div>          
@@ -725,24 +964,8 @@ function App() {
           </Col>
         </Row>
 
-        <Row style={{ textAlign:"center", paddingBottom: "40px", backgroundColor: "#202124", color:"#ffffff" }}>     
-          <Col md={2}></Col>
-          <Col md={2}>
-            <div style={{ paddingTop:"20px"}}></div>
-            <img alt="Sunny Sahota" src="/config/images/team/sunnysahota-marketer-nft-researcher-futurenftmints.jpeg" width="200px" />
-            <br /><div style={{ fontSize: "1.25em"}}>Sunny Sahota</div>
-            Marketing / Research
-            <br /><a href="https://twitter.com/_sunnysahota" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
-            &nbsp;&nbsp;<a href="https://www.linkedin.com/in/ssahota/" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
-          </Col>
-          <Col md={2}>
-            <div style={{ paddingTop:"20px"}}></div>
-            <img alt="Mike Taylor" src="/config/images/team/krishnabrahmaroutu-nft-researcher-futurenftmints.jpg" width="200px" />
-            <br /><div style={{ fontSize: "1.25em"}}>Krishna Brahmaroutu</div>
-            NFT Reseacher
-            <br /><a href="https://twitter.com/krishnaenae" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
-            &nbsp;&nbsp;<a href="https://www.linkedin.com/mwlite/in/krishna-brahmaroutu-926251186" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
-          </Col>
+        <Row style={{ textAlign:"center", paddingTop:"10px", paddingBottom: "40px", backgroundColor: "#202124", color:"#ffffff" }}>     
+          <Col md={2}></Col>          
           <Col md={2}>
             <div style={{ paddingTop:"20px"}}></div>
             <img alt="Harrison Smith" src="/config/images/team/harrisonsmith-nft-researcher-futurenftmints.jpeg" width="200px" />
@@ -753,25 +976,24 @@ function App() {
           </Col>
           <Col md={2}>
             <div style={{ paddingTop:"20px"}}></div>
+            <img alt="Mike Taylor" src="/config/images/team/krishnabrahmaroutu-nft-researcher-futurenftmints.jpg" width="200px" />
+            <br /><div style={{ fontSize: "1.25em"}}>Krishna Brahmaroutu</div>
+            NFT Reseacher
+            <br /><a href="https://twitter.com/krishnaenae" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
+            &nbsp;&nbsp;<a href="https://www.linkedin.com/mwlite/in/krishna-brahmaroutu-926251186" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
+          </Col>          
+          <Col md={2}>
+            <div style={{ paddingTop:"20px"}}></div>
             <img alt="Andrew Cosgrove" src="/config/images/team/andrewcosgrove-legaladvisor-futurenftmints.jpeg" width="200px" />
             <br /><div style={{ fontSize: "1.25em"}}>Andrew Cosgrove</div>
             Legal Advisor
             <br /><a href="https://twitter.com/AndrewTCosgrove" target="_BLANK"><img width="20" src="/config/images/twitter-logo.png" /></a>
             &nbsp;&nbsp;<a href="https://www.linkedin.com/in/andrew-cosgrove-26062784/" target="_BLANK"><img width="20" src="/config/images/linkedin-logo.png" /></a>
           </Col>
-        </Row>
-                
-        <Row style={{ paddingTop: "40px", paddingBottom: "40px", backgroundColor: "#000000", textAlign: "center" }}>          
-          <div style={{ fontSize: "2em", paddingBottom:"5px", color:"#ffffff" }}>
-            Funding Milestones                       
-          </div>  
-          <div style={{ fontSize: "1em", paddingBottom:"40px", color:"#ffffff"}}>as of Apr 26, 2022</div>
-          <Col xs={12}>
-            <img alt="Future NFT Mints funding milestones" src="/config/images/fundingMilestones.png" width="80%" />
-          </Col>
-        </Row>
+        </Row>                      
 
         <Row fluid style={{ backgroundImage: "linear-gradient(#000000 10%, #A11692, #BD2164)"}}>
+          {/*}
           <Row>
             <Col md={3}></Col>
             <Col xs={12} md={7}>
@@ -801,6 +1023,7 @@ function App() {
               </Row>
             </Col>
           </Row>
+          */}
 
           <Row style={{ paddingTop: "100px" }}>
           <Col style={{ textAlign:"center", fontSize: "2em", color: " #ffffff" }}>
