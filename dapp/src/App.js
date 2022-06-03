@@ -879,7 +879,7 @@ function App() {
                   </div>
                   <div className="timeline-content">
                     <div style={{ color:"#ffffff" }}>
-                        <div style={{fontSize:"1.25em"}}>Profile Page, Multiple Wallets, and new NFT for 1-year access</div>
+                        <div style={{fontSize:"1.25em"}}>Profile Page, Multiple Wallets, and New 1-Year Access NFT</div>
                         <div style={{ fontSize:"1em", marginTop:"10px"}}>
                           <ul>
                             <li>- User profile pages</li>
@@ -903,8 +903,8 @@ function App() {
               <div style={{ padding:"0px 10px", marginBottom:"50px"}}>
                 <div className="timeline-future">
                   <div className="row">
-                    <div className="col-md-3"></div>
-                    <div className="col-md-6 col-12" style={{ background: "#1a233a", borderRadius: "4px", padding: "20px 30px" }}>
+                    <div className="col-lg-3"></div>
+                    <div className="col-lg-6 col-12" style={{ background: "#0E1117", borderRadius: "4px", padding: "20px 30px" }}>
                         <div className="row" style={{fontSize:"1.5em", color:"#ffffff", textAlign:"center"}}>
                           <div>Phase 2</div>
                         </div>
