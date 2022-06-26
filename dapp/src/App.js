@@ -16,6 +16,7 @@ import Accordion from "react-bootstrap/Accordion";
 import Countdown, { zeroPad } from 'react-countdown';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { render } from "react-dom";
 
 const truncate = (input, len) =>
   input.length > len ? `${input.substring(0, len)}...` : input;
@@ -58,6 +59,7 @@ function App() {
   const data = useSelector((state) => state.data);
   const [claimingNft, setClaimingNft] = useState(false);
   const [feedback, setFeedback] = useState(`Click buy to mint your NFT.`);
+  const [mintRemaining, setMintRemaining] = useState();
   const [mintAmount, setMintAmount] = useState(0);
   const [CONFIG, SET_CONFIG] = useState({
     CONTRACT_ADDRESS: "",
@@ -233,7 +235,7 @@ function App() {
     });
     const config = await configResponse.json();
     SET_CONFIG(config);
-  };
+  };  
 
   const getFeedback = async () => {
     let currentPhase,
@@ -255,9 +257,10 @@ function App() {
     } else {
       maxRemainingMint = 0
       currentPhase = 'this'
-    }
+    }    
 
-    setFeedback(`${blockchain.account} can mint ${maxRemainingMint} during ${currentPhase} phase`)
+    setFeedback(`${blockchain.account}`)
+    setMintRemaining(`can mint up to ${maxRemainingMint}`)
   };
 
   useEffect(() => {
@@ -286,9 +289,11 @@ function App() {
 
   const progressBar = () => {
     if (blockchain.account!== "" && blockchain.smartContract !== null) {
-      return <><Row style={{ paddingTop:"25px" }}>
+      return <><Row>
             <Col>
-              <ProgressBar now={data.totalSupply / CONFIG.MAX_SUPPLY * 100} />
+              <div className="progress">
+                <div className="progress-bar" role="progressbar" style={{width: `${data.totalSupply / CONFIG.MAX_SUPPLY * 100}%`, backgroundColor:"#F83700"}} aria-valuemin="0" aria-valuemax="100" ></div>
+              </div>
             </Col>
           </Row>
           <Row style={{ paddingTop:"5px" }}>
@@ -342,14 +347,14 @@ function App() {
         color: "#ffffff",
       }}
     >
-      <Col style={{textAlign: "center" }}>{feedback}</Col>
+      <Col style={{textAlign: "center", fontSize:"0.8em", paddingTop:"10px" }}>{feedback}<br />{mintRemaining}</Col>
     </Row> : null
   }
 
   const connectedWalletMintUI = () => {    
 
     return shouldRenderConnectedWalletMintUI() ? <>
-      <s.SpacerMedium />
+      <s.SpacerSmall />
       <s.Container ai={"center"} jc={"center"} fd={"row"}>
         <StyledRoundButton
           style={{ lineHeight: 0.4 }}
@@ -392,205 +397,176 @@ function App() {
           } }
         >
           {claimingNft ? "BUSY" : "BUY"}
-        </Button>
+        </Button>  
       </s.Container>
+      {feedbackMessage()}      
     </> : null
   }
 
   const header = () => {
 
-    return <Navbar collapseOnSelect expand="lg" variant="dark" style={{backgroundColor: "#000000", position:"fixed", width:"100%", zIndex:"100" }}>
-        <Container>
-          <Navbar.Brand href="#home">
+    return <Navbar fixed="top" collapseOnSelect expand="lg" variant="dark" style={{backgroundColor: "#1F2731" }}>
+    <Container>
+        <Navbar.Brand href="/">
             <img
-              alt=""
-              src="/config/images/logo.png"
-              height="30"
-              className="d-inline-block align-top"
+            alt=""
+            src="/config/images/logo.png"
+            height="30"
+            className="d-inline-block align-top"
             />{' '}
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-          <Navbar.Collapse id="responsive-navbar-nav">
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
 
             </Nav>
-            <Nav>
 
-              <Nav.Link href="#benefits" style={{ color: "#ffffff", verticalAlign: "baseline" }}>
+            <Nav.Link href="#benefits" style={{ color: "#ffffff", verticalAlign: "baseline" }}>
                 Benefits
-              </Nav.Link>
-              <Nav.Link href="#roadmap" style={{ color: "#ffffff" }}>
+            </Nav.Link>
+            <Nav.Link href="#roadmap" style={{ color: "#ffffff" }}>
                 Roadmap
-              </Nav.Link>
-              <Nav.Link href="#team" style={{ color: "#ffffff" }}>
+            </Nav.Link>
+            <Nav.Link href="#team" style={{ color: "#ffffff" }}>
                 Team
-              </Nav.Link>
-              <Nav.Link target={"_blank"} href="https://docs.google.com/document/d/169NvaWHpPEKkg6AucydhaOuz_Hn5ecexVfLDoe3mI08/edit#heading=h.z4mifle893rx" style={{ color: "#ffffff" }}>
+            </Nav.Link>
+            <Nav.Link target={"_blank"} href="https://docs.google.com/document/d/169NvaWHpPEKkg6AucydhaOuz_Hn5ecexVfLDoe3mI08/edit#heading=h.z4mifle893rx" style={{ color: "#ffffff" }}>
                 White Paper
-              </Nav.Link>
-              <Nav.Link href="#faqs" style={{ color: "#ffffff" }}>
+            </Nav.Link>
+            <Nav.Link href="#faqs" style={{ color: "#ffffff" }}>
                 FAQs
-              </Nav.Link>
-              <Nav.Link target={"_blank"} href="https://twitter.com/futurenftmints">
+            </Nav.Link>
+            <Nav.Link target={"_blank"} href="https://twitter.com/futurenftmints">
                 <img
-                  alt=""
-                  src="/config/images/twitter.png"
-                  height="20"
-                  className="d-inline-block align-top"
+                alt=""
+                src="/config/images/twitter.png"
+                height="20"
+                className="d-inline-block align-top"
                 />
-              </Nav.Link>
-              <Nav.Link target={"_blank"} href="https://discord.gg/futurenftmints">
+            </Nav.Link>
+            <Nav.Link target={"_blank"} href="https://discord.gg/futurenftmints">
                 <img
-                  alt=""
-                  src="/config/images/discord.png"
-                  height="20"
-                  className="d-inline-block align-top"
+                alt=""
+                src="/config/images/discord.png"
+                height="20"
+                className="d-inline-block align-top"
                 />
-              </Nav.Link>
-              <Nav.Link target={"_blank"} href="https://opensea.io/collection/future-nft-mints-genesis-nft">
+            </Nav.Link>
+            <Nav.Link target={"_blank"} href="https://opensea.io/collection/future-nft-mints-genesis-nft">
                 <img
-                  alt=""
-                  src="/config/images/opensea.png"
-                  height="20"
-                  className="d-inline-block align-top"
-                />
-              </Nav.Link>
-              <Nav.Link target={"_blank"} href="https://app.futurenftmints.com">
-                <span className="btn-sm btn-light text-center">Register</span>
-              </Nav.Link>
-            
-
-            
-            {/*
-            <StyledLink target={"_blank"} href="https://opensea.io/collection/future-nft-mints-genesis-nft">
-              <img
                 alt=""
                 src="/config/images/opensea.png"
-                height="30"
+                height="20"
                 className="d-inline-block align-top"
-              />{' '}&nbsp;&nbsp;&nbsp;
-            </StyledLink>
+                />
+            </Nav.Link>
+            <Nav.Link href="#mint">
+              <button className="btn" style={{ backgroundColor: "#F83700", border: "#F83700", color:"#ffffff" }}>
+                  Mint Now
+              </button> 
+            </Nav.Link>    
+            <Nav.Link href="https://app.futurenftmints.com" style={{ color: "#ffffff" }}>
+                Login
+            </Nav.Link>                  
 
-            { (blockchain.account === "" ||  blockchain.smartContract === null) ?
-              <Button style={{ backgroundColor: "#F83700", border: "#F83700" }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  dispatch(connect());
-                  getData();
-                } }
-              >
-                Connect Wallet
-              </Button> : null
-            }
-            */}
-
-
-
-
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+        </Navbar.Collapse>
+    </Container>
+</Navbar>
       
 }
 
   return (
     <>      
 
-      {header()}
+      
+      {header()}}
       
 
       <Container fluid>
 
-        <Row style={{ paddingTop: "50px", paddingBottom: "20px", backgroundColor: "#000000" }}>
+        <Row style={{ paddingTop: "100px", paddingBottom: "50px", backgroundColor: "#0F0C1D", overflow:"hidden" }}>
           <Col md={1}></Col>
-          <Col md={6}>            
+          <Col sm={12} lg={6} >       
+            <Row >
+              <div className="col-2">
+                <img
+                  alt=""
+                  src="/config/images/cryEmoji.png" 
+                  height="50px"              
+                  className="d-inline-block align-top"
+                  />
+              </div>
+              <div className="col-2">
+                <img
+                  alt=""
+                  src="/config/images/discordMessages.png"
+                  height="50px"  
+                  className="d-inline-block align-top"
+                  />
+              </div>
+              <div className="col-2">
+                <img
+                  alt=""
+                  src="/config/images/telegramMessages.png"
+                  height="50px"
+                  className="d-inline-block align-top"
+                  />
+              </div>
+              <div className="col-2">
+                <img
+                  alt=""
+                  src="/config/images/twitterMessages.png"
+                  height="50px"
+                  className="d-inline-block align-top"
+                  />
+              </div>
+            </Row>     
             <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"3em", lineHeight: "1em" }}>
-              <Col>Guide your buying decisions with access to<br />the most in-depth NFT research and analysis</Col>
+              <Col>There's a better way to research NFTs</Col>
             </Row>
-            {/*
-            <Row style={{ backgroundImage: "linear-gradient(0.15turn, #A11692, #BD2164, #FAC921 60%)", 
-                          WebkitBackgroundClip: "text",
-                          WebkitTextFillColor: "transparent",
-                          fontSize:"3em", 
-                          lineHeight: "1em" }}>
-              <Col>the most in-depth NFT research and analysis</Col>
-            </Row>
-            */}
             <Row style={{ paddingTop: "20px" }}>
               <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"1.5em" }}>
-                <Col>At Future NFT Mints, we know that it can be hard keeping up with upcoming mint dates and 
-                knowing which NFTs to mint. That’s why the Genesis NFT gives you exclusive access to our research 
-                and analysis platform.
-                <br /><br />
-                In addition to our research, you will receive entries to giveaways that we run. 
-                The potential prizes for these giveaways include Allow List access to other NFT mints, virtual event access, and IRL invitations. </Col>
-              </Row>              
+                <Col>
+                Introducing the Future NFT Mints token-gated platform
+                </Col>
+              </Row>
+              <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"1em" }}>
+                <Col>
+                Time-saving, in-depth, community-driven research. All in one place.           
+                </Col>
+              </Row>
+              <Row style={{ paddingTop: "60px", color: "#ffffff", fontSize:"1em" }}>
+                <Col>
+                  To gain access to the platform, mint a Genesis NFT for 0.25 ETH.
+                </Col>
+              </Row>   
+              <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"1em" }}>
+                <Nav.Link href="#mint">
+                  <button className="btn" style={{ backgroundColor: "#F83700", border: "#F83700", color:"#ffffff" }}>
+                      Mint Now
+                  </button> 
+                </Nav.Link>
+              </Row>
+              <Row style={{ paddingTop: "30px", color: "#ffffff", fontSize:"0.7em" }}>
+                <Col>
+                  Already have a Genesis NFT? <a href="https://app.futurenftmints.com" style={{ color: "#ffffff" }}>Register or login here.</a>
+                </Col>
+              </Row>
+            </Row>
+          </Col>            
+
+          <Col lg={5}>
+            <Row >
+              <div className="col-12" style={{ paddingTop: "60px"}}>
+                <img
+                  alt=""
+                  src="/config/images/macbookpro.png" 
+                  width="700px"           
+                  className=""
+                  />
+              </div>
             </Row>
           </Col>
-          <Col md={4}>
-            <Row style={{ paddingTop:"20px", textAlign: "center" }}>
-              <Col><img fluid="true" alt="Future NFT Mints - Genesis NFT Card" src="/config/images/fnftm-card.png" width="80%" className="d-inline-block align-top"/></Col>
-            </Row>
-
-            <Row style={{ marginTop:"50px", backgroundColor: "#212529", borderRadius: "5px", marginLeft:"1px", marginRight:"1px" }}>
-              <Col>
-                <Row style={{ paddingTop:"25px" }}>
-                  <Col style={{ textAlign: "center", color: "#ffffff", fontSize:"1.5em" }}>Mint Genesis NFT</Col>
-                </Row>
-
-                <Row style={{ paddingTop:"25px" }}>
-                  <Col xs={3} style={{ textAlign: "left", color: "#ffffff" }}>PHASE</Col>
-                  {mintPhaseMessage()}
-                </Row>
-
-                {progressBar()}
-
-                <Row>
-
-                  <Col xs={12} style={{ paddingTop:"25px", textAlign: "center" }}>
-                    {Number(data.totalSupply) >= CONFIG.MAX_SUPPLY ? (
-                      <>
-                        <s.TextTitle
-                          style={{ textAlign: "center", color: "#ffffff" }}
-                        >
-                          The sale has ended.
-                        </s.TextTitle>
-                        <s.TextDescription
-                          style={{ textAlign: "center", color: "#ffffff" }}
-                        >
-                          You can still find {CONFIG.NFT_NAME} on
-                        </s.TextDescription>
-                        <s.SpacerSmall />
-                        <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href={CONFIG.MARKETPLACE_LINK}>
-                          {CONFIG.MARKETPLACE}
-                        </StyledLink>
-                      </>
-                    ) : (
-                      <>
-                        {feedbackMessage()}
-                        { blockchain.account === "" || blockchain.smartContract === null ?
-                          connectWalletContainer() : connectedWalletMintUI()
-                        }
-                      </>
-                    )}
-                  </Col>
-                </Row>
-
-
-                <Row style={{ paddingTop:"20px" }}>
-                  <Col>
-                  <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href="https://etherscan.io/address/0x5f66F72a4f87ec3Cd06241400bD2bA867F1233c7">Smart Contract on Etherscan</StyledLink>
-                  </Col>
-                </Row>
-                <Row  style={{ paddingBottom:"25px" }}></Row>
-
-              </Col>
-
-            </Row>
-
-          </Col>
-          <Col md={1}></Col>
         </Row>
         <Row style={{textAlign:"center", background:"#000000"}}>
           <Col style={{fontSize:"2em", marginTop:"30px", marginBottom:"50px", color:"#ffffff"}}>
@@ -701,6 +677,63 @@ function App() {
           </Col>
         </Row>
         
+        <a id="mint"></a>
+        <Row style={{ paddingTop:"20px", textAlign: "center", backgroundColor: "#000000" }}>          
+          <div className="col-md-2"></div>
+          <div className="col-md-3">
+            <img fluid="true" alt="Future NFT Mints - Genesis NFT Card" src="/config/images/fnftm-card.png" width="200px" className="d-inline-block align-top"/>            
+          </div>
+        
+          <div className="col-md-5">
+            <Row style={{ paddingTop:"25px", paddingBottom:"25px" }}>
+              <Col style={{ textAlign: "center", color: "#ffffff", fontSize:"1.5em" }}>Mint Genesis NFT</Col>
+            </Row>                
+
+            {progressBar()}
+
+            <Row>
+
+              <Col xs={12} style={{ paddingTop:"0px", textAlign: "center" }}>
+                {Number(data.totalSupply) >= CONFIG.MAX_SUPPLY ? (
+                  <>
+                    <s.TextTitle
+                      style={{ textAlign: "center", color: "#ffffff" }}
+                    >
+                      The sale has ended.
+                    </s.TextTitle>
+                    <s.TextDescription
+                      style={{ textAlign: "center", color: "#ffffff" }}
+                    >
+                      You can still find {CONFIG.NFT_NAME} on
+                    </s.TextDescription>
+                    <s.SpacerSmall />
+                    <StyledLink style={{ color:"#fff", textDecoration:"underline"}} target={"_blank"} href={CONFIG.MARKETPLACE_LINK}>
+                      {CONFIG.MARKETPLACE}
+                    </StyledLink>
+                  </>
+                ) : (
+                  <>
+                    
+                    { blockchain.account === "" || blockchain.smartContract === null ?
+                      connectWalletContainer() : connectedWalletMintUI()
+                    }
+                  </>
+                )}
+              </Col>
+            </Row>
+
+            <Row style={{ paddingTop:"10px" }}>
+              <Col>
+              <StyledLink style={{ color:"#fff", textDecoration:"underline", fontSize:"0.6em"}} target={"_blank"} href="https://etherscan.io/address/0x5f66F72a4f87ec3Cd06241400bD2bA867F1233c7">Smart Contract on Etherscan</StyledLink>
+              </Col>
+            </Row>
+            
+            <Row  style={{ paddingBottom:"25px" }}></Row>
+
+          </div>
+          <div className="col-md-2"></div>
+
+        </Row>
         <a id="roadmap"></a>
         <Row style={{backgroundColor:"#000000"}}>
           <Col>
@@ -815,7 +848,7 @@ function App() {
                     <a style={{ color:"#ffffff", fontSize:"1.25em"}} href="https://app.futurenftmints.com" >Launch Token Gated Registration</a>
                       <div className="text-center" style={{ marginTop:"20px"}}>
                         <div>
-                          <iframe width="240" src="https://www.youtube.com/embed/4rkwU8tcEZY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                          <iframe width="240" src="https://www.youtube.com/embed/4rkwU8tcEZY" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                         </div>
                       </div>
                     </div>
@@ -881,7 +914,7 @@ function App() {
                     <div style={{ color:"#ffffff" }}>
                         <div style={{fontSize:"1.25em"}}>Profile Page, Multiple Wallets, and New 1-Year Access NFT</div>
                         <div style={{ fontSize:"1em", marginTop:"10px"}}>
-                          <ul>
+                          <ul>year
                             <li>- User profile pages</li>
                             <li>- Add multiple wallets</li>
                             <li>- Mint new NFT (supply and price TBD) - Genesis NFT receives 1 for free</li>
@@ -992,7 +1025,7 @@ function App() {
           </Col>
         </Row>                      
 
-        <Row fluid style={{ backgroundImage: "linear-gradient(#000000 10%, #A11692, #BD2164)"}}>
+        <Row style={{ backgroundImage: "linear-gradient(#000000 10%, #A11692, #BD2164)"}}>
           {/*}
           <Row>
             <Col md={3}></Col>
