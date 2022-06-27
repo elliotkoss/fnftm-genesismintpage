@@ -1,7 +1,6 @@
 
 .timeline {
     position: relative;
-    background: #000000;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -16,7 +15,7 @@
     top: 0;
     left: 50%;
     margin-left: -2px;
-    border-right: 2px dashed #0E1117;
+    border-right: 2px dashed #202124;
     height: 100%;
     display: block;
 }
@@ -43,7 +42,7 @@
 .timeline-row .timeline-content {
     position: relative;
     padding: 20px 30px;
-    background: #0E1117;
+    background: #202124;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -59,7 +58,7 @@
     top: 20px;
     height: 16px;
     width: 16px;
-    background: #0E1117;
+    background: #202124;
 }
 .timeline-row .timeline-content:before {
     content: "";
@@ -72,8 +71,8 @@
     -moz-border-radius: 100px;
     border-radius: 100px;
     z-index: 10;
-    background: #0E1117;
-    border: 2px dashed #0E1117;
+    background: #202124;
+    border: 2px dashed #202124;
 }
 .timeline-row .timeline-content h4 {
     margin: 0 0 20px 0;
