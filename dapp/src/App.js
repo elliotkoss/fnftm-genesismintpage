@@ -205,7 +205,7 @@ function App() {
           `WOW, the ${CONFIG.NFT_NAME} is yours! Go visit OpenSea to view it.`
         );
         setMintRemaining();
-        axios.get(`https://staging.futurenftmints.com/api/referral/${CONFIG.CONTRACT_ADDRESS}/${blockchain.account}/${referrer}/${mintAmount}`); 
+        axios.get(`https://app.futurenftmints.com/api/referral/${CONFIG.CONTRACT_ADDRESS}/${blockchain.account}/${referrer}/${mintAmount}`); 
         console.log('sent referral');
         setClaimingNft(false);
         dispatch(fetchData(blockchain.account));
