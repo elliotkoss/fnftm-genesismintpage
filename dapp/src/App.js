@@ -14,9 +14,20 @@ import Col from "react-bootstrap/Col";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Accordion from "react-bootstrap/Accordion";
 import Countdown, { zeroPad } from 'react-countdown';
+import axios from 'axios';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { render } from "react-dom";
+
+let referrer = window.location.pathname.replace("/", "");
+referrer == "" ? referrer = 'none' : referrer;
+const mintAnchor = window.location.pathname + '#mint';
+const benefitsAnchor = window.location.pathname + '#benefits';
+const roadmapAnchor = window.location.pathname + '#roadmap';
+const teamAnchor = window.location.pathname + '#team';
+const faqsAnchor = window.location.pathname + '#faqs';
+const homeAnchor = window.location.pathname;
+//console.log(window.location.pathname, mintAnchor);
 
 const truncate = (input, len) =>
   input.length > len ? `${input.substring(0, len)}...` : input;
@@ -95,15 +106,18 @@ function App() {
     let gasLimit = CONFIG.GAS_LIMIT;
     let totalCostWei = String(cost * mintAmount);
     let totalGasLimit = String(gasLimit * mintAmount);
+    /*
     console.log("Cost: ", totalCostWei);
     console.log("Gas limit: ", totalGasLimit);
     console.log("totalSupply: ", data.totalSupply)
     console.log("isAllowListMintEnabled: ", data.isAllowListMintEnabled)
     console.log("isPresaleMintEnabled: ", data.isPresaleMintEnabled)
     console.log("isPublicMintEnabled: ", data.isPublicMintEnabled)
+    */
 
     if (data.isAllowListMintEnabled) {
       setFeedback(`Minting your ${CONFIG.NFT_NAME}...`);
+      setMintRemaining();
       setClaimingNft(true);
 
       if (data.isPublicMintEnabled) {
@@ -130,6 +144,7 @@ function App() {
       .once("error", (err) => {
         console.log(err);
         setFeedback("Sorry, something went wrong please try again later.");
+        setMintRemaining();
         setClaimingNft(false);
       })
       .then((receipt) => {
@@ -137,6 +152,7 @@ function App() {
         setFeedback(
           `WOW, the ${CONFIG.NFT_NAME} is yours! Go visit OpenSea to view it.`
         );
+        setMintRemaining();
         setClaimingNft(false);
         dispatch(fetchData(blockchain.account));
       });
@@ -154,6 +170,7 @@ function App() {
       .once("error", (err) => {
         console.log(err);
         setFeedback("Sorry, something went wrong please try again later.");
+        setMintRemaining();
         setClaimingNft(false);
       })
       .then((receipt) => {
@@ -161,6 +178,7 @@ function App() {
         setFeedback(
           `WOW, the ${CONFIG.NFT_NAME} is yours! Go visit OpenSea to view it.`
         );
+        setMintRemaining();
         setClaimingNft(false);
         dispatch(fetchData(blockchain.account));
       });
@@ -178,17 +196,23 @@ function App() {
       .once("error", (err) => {
         console.log(err);
         setFeedback("Sorry, something went wrong please try again later.");
+        setMintRemaining();
         setClaimingNft(false);
       })
       .then((receipt) => {
-        console.log(receipt);
+        //console.log('receipt', receipt, 'blockchain', blockchain, 'mintAmount');
         setFeedback(
           `WOW, the ${CONFIG.NFT_NAME} is yours! Go visit OpenSea to view it.`
         );
+        setMintRemaining();
+        axios.get(`https://staging.futurenftmints.com/api/referral/${CONFIG.CONTRACT_ADDRESS}/${blockchain.account}/${referrer}/${mintAmount}`); 
+        console.log('sent referral');
         setClaimingNft(false);
         dispatch(fetchData(blockchain.account));
       });
   };
+
+  //console.log( `https://staging.futurenftmints.com/api/referral/${CONFIG.CONTRACT_ADDRESS}/${blockchain.account}/${referrer}/${mintAmount}` );
 
   const decrementMintAmount = () => {
     let newMintAmount = mintAmount - 1;
@@ -409,7 +433,7 @@ function App() {
 
     return <Navbar fixed="top" collapseOnSelect expand="lg" variant="dark" style={{backgroundColor: "#1F2731" }}>
     <Container>
-        <Navbar.Brand href="/">
+        <Navbar.Brand href={homeAnchor}>
             <img
             alt=""
             src="/config/images/logo.png"
@@ -422,19 +446,19 @@ function App() {
             <Nav className="me-auto">
 
             </Nav>
-            <Nav.Link href="#benefits" style={{ color: "#ffffff", verticalAlign: "baseline" }}>
+            <Nav.Link href={benefitsAnchor} style={{ color: "#ffffff", verticalAlign: "baseline" }}>
                 Benefits
             </Nav.Link>
-            <Nav.Link href="#roadmap" style={{ color: "#ffffff" }}>
+            <Nav.Link href={roadmapAnchor} style={{ color: "#ffffff" }}>
                 Roadmap
             </Nav.Link>
-            <Nav.Link href="#team" style={{ color: "#ffffff" }}>
+            <Nav.Link href={teamAnchor} style={{ color: "#ffffff" }}>
                 Team
             </Nav.Link>
             <Nav.Link target={"_blank"} href="https://docs.google.com/document/d/169NvaWHpPEKkg6AucydhaOuz_Hn5ecexVfLDoe3mI08/edit#heading=h.z4mifle893rx" style={{ color: "#ffffff" }}>
                 White Paper
             </Nav.Link>
-            <Nav.Link href="#faqs" style={{ color: "#ffffff" }}>
+            <Nav.Link href={faqsAnchor} style={{ color: "#ffffff" }}>
                 FAQs
             </Nav.Link>
             <Nav.Link target={"_blank"} href="https://twitter.com/futurenftmints">
@@ -461,7 +485,7 @@ function App() {
                 className="d-inline-block align-top"
                 />
             </Nav.Link>
-            <Nav.Link href="#mint">
+            <Nav.Link href={mintAnchor}>
               <button className="btn" style={{ backgroundColor: "#F83700", border: "#F83700", color:"#ffffff" }}>
                   Mint now
               </button> 
@@ -542,7 +566,7 @@ function App() {
                 </Col>
               </Row>   
               <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"1em" }}>
-                <Nav.Link href="#mint">
+                <Nav.Link href={mintAnchor}>
                   <button className="btn" style={{ backgroundColor: "#F83700", border: "#F83700", color:"#ffffff" }}>
                       Mint now
                   </button> 
@@ -693,7 +717,7 @@ function App() {
         </Row>
 
         <a id="mint"></a>
-        <Row style={{ paddingTop:"50px", paddingBottom:"50px", textAlign: "center" }}>          
+        <Row style={{ marginTop:"75px", marginBottom:"50px", textAlign: "center" }}>          
           <div className="col-md-2"></div>
           <div className="col-md-3">
             <img fluid="true" alt="Future NFT Mints - Genesis NFT Card" src="/config/images/fnftm-card.png" width="200px" className="d-inline-block align-top"/>            
@@ -762,7 +786,7 @@ function App() {
               <Col>As a Genesis NFT holder, you will have access to an evolving range of benefits.</Col>
             </Row>
             <Row style={{ paddingTop: "20px", color: "#ffffff", fontSize:"1em" }}>
-                <Nav.Link href="#mint">
+                <Nav.Link href={mintAnchor}>
                   <button className="btn" style={{ backgroundColor: "#F83700", border: "#F83700", color:"#ffffff" }}>
                       Mint now
                   </button> 
@@ -931,7 +955,7 @@ function App() {
                   </div>
                   <div className="timeline-content">
                     <div>
-                      <a style={{ color:"#ffffff", fontSize:"1.25em"}} href="#team" >Recruit Team</a>                                        
+                      <a style={{ color:"#ffffff", fontSize:"1.25em"}} href={teamAnchor} >Recruit Team</a>                                        
                     </div>
                     <div className="d-flex justify-content-end" style={{marginTop:"10px"}}>
                       <span className="badge bg-success text-black" style={{ width:"120px"}} >
