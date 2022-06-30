@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from 'react-router-dom';
-import { connect } from "./redux/blockchain/blockchainActions";
-import { fetchData } from "./redux/data/dataActions";
-import * as s from "./styles/globalStyles";
+import { connect } from "../redux/blockchain/blockchainActions";
+import { fetchData } from "../redux/data/dataActions";
+import * as s from "../styles/globalStyles";
 import styled from "styled-components";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
