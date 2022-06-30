@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Homepage from './Homepage';
+import Error from './Error';
 
 
 class App extends Component {
@@ -13,7 +14,8 @@ class App extends Component {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Homepage />} />
-                        <Route path="/:referrer" element={<Homepage />} />
+                        <Route exact path="/error" element={<Error />} />
+                        <Route path="/:referrer" element={<Homepage />} />                        
                     </Routes>
                 </BrowserRouter>
         );
