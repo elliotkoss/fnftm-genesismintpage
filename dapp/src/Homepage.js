@@ -209,7 +209,7 @@ function Homepage() {
         );
         setMintRemaining();
         axios.get(`https://app.futurenftmints.com/api/referral/${CONFIG.CONTRACT_ADDRESS}/${blockchain.account}/${referrer}/${mintAmount}`); 
-        console.log('sent referral');
+        //console.log('sent referral');
         setClaimingNft(false);
         dispatch(fetchData(blockchain.account));
       });
