@@ -13,7 +13,7 @@ class App extends Component {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Homepage />} />
-                        <Route path="/:test" element={<Homepage />} />
+                        <Route path="/:referrer" element={<Homepage />} />
                     </Routes>
                 </BrowserRouter>
         );

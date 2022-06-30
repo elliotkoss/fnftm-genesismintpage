@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from 'react-router-dom';
 import { connect } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/data/dataActions";
 import * as s from "./styles/globalStyles";
@@ -18,16 +19,6 @@ import axios from 'axios';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { render } from "react-dom";
-
-let referrer = window.location.pathname.replace("/", "");
-referrer == "" ? referrer = 'none' : referrer;
-const mintAnchor = window.location.pathname + '#mint';
-const benefitsAnchor = window.location.pathname + '#benefits';
-const roadmapAnchor = window.location.pathname + '#roadmap';
-const teamAnchor = window.location.pathname + '#team';
-const faqsAnchor = window.location.pathname + '#faqs';
-const homeAnchor = window.location.pathname;
-//console.log(window.location.pathname, mintAnchor);
 
 const truncate = (input, len) =>
   input.length > len ? `${input.substring(0, len)}...` : input;
@@ -65,6 +56,18 @@ export const StyledLink = styled.a`
 `;
 
 function Homepage() {
+
+  //console.log(useParams().referrer);
+  let referrer = window.location.pathname.replace("/", "");
+  referrer == "" ? referrer = 'none' : referrer;
+  const mintAnchor = window.location.pathname + '#mint';
+  const benefitsAnchor = window.location.pathname + '#benefits';
+  const roadmapAnchor = window.location.pathname + '#roadmap';
+  const teamAnchor = window.location.pathname + '#team';
+  const faqsAnchor = window.location.pathname + '#faqs';
+  const homeAnchor = window.location.pathname;
+  //console.log(window.location.pathname, mintAnchor);
+
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
@@ -212,7 +215,7 @@ function Homepage() {
       });
   };
 
-  //console.log( `https://staging.futurenftmints.com/api/referral/${CONFIG.CONTRACT_ADDRESS}/${blockchain.account}/${referrer}/${mintAmount}` );
+  //console.log( `https://app.futurenftmints.com/api/referral/${CONFIG.CONTRACT_ADDRESS}/${blockchain.account}/${referrer}/${mintAmount}` );
 
   const decrementMintAmount = () => {
     let newMintAmount = mintAmount - 1;
