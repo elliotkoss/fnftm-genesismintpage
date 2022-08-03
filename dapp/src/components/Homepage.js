@@ -74,7 +74,7 @@ function Homepage() {
   const [claimingNft, setClaimingNft] = useState(false);
   const [feedback, setFeedback] = useState(`Click buy to mint your NFT.`);
   const [mintRemaining, setMintRemaining] = useState();
-  const [mintAmount, setMintAmount] = useState(0);
+  const [mintAmount, setMintAmount] = useState(1);
   const [CONFIG, SET_CONFIG] = useState({
     CONTRACT_ADDRESS: "",
     SCAN_LINK: "",
