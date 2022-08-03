@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Homepage from './Homepage';
 import Error from './Error';
+import Mint from './Mint';
 
 
 class App extends Component {
@@ -14,6 +15,7 @@ class App extends Component {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Homepage />} />
+                        <Route exact path="/mint" element={<Mint />} />
                         <Route exact path="/error" element={<Error />} />
                         <Route path="/:referrer" element={<Homepage />} />                        
                     </Routes>
